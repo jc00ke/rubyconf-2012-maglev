@@ -1,0 +1,12 @@
+namespace :db do
+  desc 'Migrate the database'
+  task :migrate do
+    require_relative 'db/connection'
+    Sequel.extension :migration
+    migration_path = 'db/migrations'
+    unless Sequel::Migrator.is_current?(DB, migration_path)
+      Sequel::Migrator.run(DB, migration_path)
+    end
+  end
+
+end
