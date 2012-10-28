@@ -13,12 +13,12 @@ class Part
     @cost = opts.fetch(:cost)
     @count = opts.fetch(:count) { 0 }
     generate_part_number
-    @components = Set.new
+    @components = Hash.new(0)
     @where_used = Set.new
   end
 
   def add_component(part)
-    @components << part
+    @components[part] += 1
     part.used_in self
   end
 

@@ -21,7 +21,7 @@ class TestPart < Test::Unit::TestCase
     assert_not_nil @pencil.part_number
     assert_equal @cost, @pencil.cost
     assert_equal @count, @pencil.count
-    assert_equal Set.new, @pencil.components
+    assert_equal Hash.new, @pencil.components
     assert_equal Set.new, @pencil.where_used
   end
 
