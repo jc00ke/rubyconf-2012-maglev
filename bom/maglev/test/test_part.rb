@@ -43,4 +43,11 @@ class TestPart < Test::Unit::TestCase
     @pencil.add_component @eraser
     assert 2, @pencil.quantity_of(@eraser)
   end
+
+  def test_total_cost
+    @pencil.add_component @eraser
+    @pencil.add_component @eraser
+
+    assert 12, @pencil.total_cost
+  end
 end

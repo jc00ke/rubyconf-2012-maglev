@@ -35,6 +35,13 @@ class Part
     @components.fetch(part) { 0 }
   end
 
+  def total_cost
+    @cost + @components.inject(0) { |amount, component|
+      amount += component.total_cost if component.respond_to?(:total_cost)
+      amount
+    }
+  end
+
   protected
   def used_in(part)
     @where_used << part
