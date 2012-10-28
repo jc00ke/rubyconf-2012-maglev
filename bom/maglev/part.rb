@@ -53,8 +53,7 @@ class Part
   end
 
   def print_components(level=1)
-    output = []
-    output << "#@name"
+    output = ["#@name"]
     components.each do |c|
       dashes = "--" * level
       output << "#{dashes} #{c.print_components(level + 1)}"
