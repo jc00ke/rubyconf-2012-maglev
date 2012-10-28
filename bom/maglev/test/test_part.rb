@@ -38,4 +38,9 @@ class TestPart < Test::Unit::TestCase
     assert !@eraser.used_in?(@pencil)
   end
 
+  def test_quantity_of
+    @pencil.add_component @eraser
+    @pencil.add_component @eraser
+    assert 2, @pencil.quantity_of(@eraser)
+  end
 end

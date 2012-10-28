@@ -31,6 +31,10 @@ class Part
     @where_used.include?(part)
   end
 
+  def quantity_of(part)
+    @components.fetch(part) { 0 }
+  end
+
   protected
   def used_in(part)
     @where_used << part
