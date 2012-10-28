@@ -35,6 +35,7 @@ class TestPart < Test::Unit::TestCase
     @pencil.add_component @eraser
     @pencil.remove_component @eraser
     assert !@pencil.components.include?(@eraser)
+    assert !@eraser.used_in?(@pencil)
   end
 
 end
