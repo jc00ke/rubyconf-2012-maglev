@@ -10,6 +10,11 @@ class TestPart < Test::Unit::TestCase
       :cost => @cost,
       :count => @count,
     })
+    @eraser = Part.new({
+      :name => "Eraser",
+      :cost => 1,
+      :count => 10
+    })
   end
 
   def test_initialization
@@ -21,13 +26,15 @@ class TestPart < Test::Unit::TestCase
   end
 
   def test_adding_component
-    eraser = Part.new({
-      :name => "Eraser",
-      :cost => 1,
-      :count => 10
-    })
-    @pencil.add_component eraser
-    assert @pencil.components.include?(eraser)
-    assert eraser.where_used.include?(@pencil)
+    @pencil.add_component @eraser
+    assert @pencil.components.include?(@eraser)
+    assert @eraser.where_used.include?(@pencil)
   end
+
+  def test_remove_component
+    @pencil.add_component @eraser
+    @pencil.remove_component @eraser
+    assert !@pencil.components.include?(@eraser)
+  end
+
 end

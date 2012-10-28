@@ -22,9 +22,18 @@ class Part
     part.used_in self
   end
 
+  def remove_component(part)
+    @components.delete(part)
+    part.remove_from(self)
+  end
+
   protected
   def used_in(part)
     @where_used << part
+  end
+
+  def remove_from(part)
+    @where_used.delete(part)
   end
 
   private
