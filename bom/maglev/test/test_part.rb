@@ -50,6 +50,12 @@ class TestPart < Test::Unit::TestCase
     assert_equal 15, @pencil.total_cost
   end
 
-    assert 12, @pencil.total_cost
+  def test_print_components
+    @body.add_components(@graphite, @wood, @fitting, @eraser)
+    @pencil.add_component(@body)
+    output = @pencil.print_components
+    assert_match(/^Pencil$/, output)
+    assert_match(/^-- Body$/, output)
+    assert_match(/^---- Graphite$/, output)
   end
 end
