@@ -34,6 +34,7 @@ class TestPart < Test::Unit::TestCase
   def test_remove_component
     @pencil.add_component @eraser
     @pencil.remove_component @eraser
+
     assert !@pencil.components.include?(@eraser)
     assert !@eraser.used_in?(@pencil)
   end
@@ -45,8 +46,11 @@ class TestPart < Test::Unit::TestCase
   end
 
   def test_total_cost
-    @pencil.add_component @eraser
-    @pencil.add_component @eraser
+    @body.add_components(@graphite, @wood, @fitting, @eraser)
+    @pencil.add_component(@body)
+
+    assert_equal 15, @pencil.total_cost
+  end
 
     assert 12, @pencil.total_cost
   end

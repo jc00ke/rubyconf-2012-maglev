@@ -3,7 +3,7 @@ require 'set'
 
 class Part
   attr_accessor :name, :description, :cost, :count
-  attr_reader :part_number, :components, :where_used
+  attr_reader :part_number, :where_used
 
   def initialize(opts)
     @name = opts.fetch(:name)
@@ -17,9 +17,19 @@ class Part
     @where_used = Set.new
   end
 
+  def components
+    @components.keys
+  end
+
   def add_component(part)
     @components[part] += 1
     part.used_in self
+  end
+
+  def add_components(*some_components)
+    some_components.each do |c|
+      add_component c
+    end
   end
 
   def remove_component(part)
@@ -36,10 +46,20 @@ class Part
   end
 
   def total_cost
-    @cost + @components.inject(0) { |amount, component|
-      amount += component.total_cost if component.respond_to?(:total_cost)
+    @cost + @components.inject(0) { |amount, (component, qty)|
+      amount += component.total_cost * qty if component.respond_to?(:total_cost)
       amount
     }
+  end
+
+  def print_components(level=1)
+    output = []
+    output << "#@name"
+    components.each do |c|
+      dashes = "--" * level
+      output << "#{dashes} #{c.print_components(level + 1)}"
+    end
+    output.join("\n")
   end
 
   protected
