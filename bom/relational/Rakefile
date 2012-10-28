@@ -1,7 +1,11 @@
 namespace :db do
+  def load_connection
+    require_relative 'db/connection'
+  end
+
   desc 'Migrate the database'
   task :migrate do
-    require_relative 'db/connection'
+    load_connection
     Sequel.extension :migration
     migration_path = 'db/migrations'
     unless Sequel::Migrator.is_current?(DB, migration_path)
@@ -9,4 +13,44 @@ namespace :db do
     end
   end
 
+  desc 'Load examples'
+  task :load do
+    require 'faker'
+    load_connection
+    require_relative 'lib/models'
+
+    graphite = Part.new do |p|
+      p.name = "Graphite"
+      p.description = "Compressed graphite to mark paper."
+      p.cost = 1
+      p.count = rand(10)
+    end
+
+    body = Part.new do |p|
+      p.name = "Body"
+      p.description = "Wood body"
+      p.cost = 1
+      p.count = rand(10)
+    end
+
+    eraser = Part.new do |p|
+      p.name = "Eraser"
+      p.description = "Pink material for erasing pencil marks."
+      p.cost = 2
+      p.count = rand(10)
+    end
+
+    eraser_fitting = Part.new do |p|
+      p.name = "Eraser Fitting"
+      p.description = "Metal fitting that the eraser sits in"
+      p.cost = 1
+      p.count = rand(10)
+    end
+
+    pencil_parts = [graphite, body, eraser, eraser_fitting]
+
+    pencil = Assembly.new do |a|
+      a.quantity = pencil_parts.map(&:count).min
+    end
+  end
 end
