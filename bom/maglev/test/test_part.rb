@@ -17,8 +17,8 @@ class TestPart < Test::Unit::TestCase
     assert_not_nil @pencil.part_number
     assert_equal @cost, @pencil.cost
     assert_equal @count, @pencil.count
-    assert_equal Hash.new, @pencil.components
-    assert_equal Set.new, @pencil.where_used
+    assert @pencil.components.empty?
+    assert @pencil.where_used.empty?
   end
 
   def test_adding_component
@@ -39,7 +39,8 @@ class TestPart < Test::Unit::TestCase
   def test_quantity_of
     @pencil.add_component @eraser
     @pencil.add_component @eraser
-    assert 2, @pencil.quantity_of(@eraser)
+
+    assert_equal 2, @pencil.quantity_of(@eraser)
   end
 
   def test_total_cost
