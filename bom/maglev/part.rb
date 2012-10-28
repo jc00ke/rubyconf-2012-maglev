@@ -61,6 +61,10 @@ class Part
     output.join("\n")
   end
 
+  def used_in?(part)
+    where_used.include? part
+  end
+
   protected
   def used_in(part)
     @where_used << part

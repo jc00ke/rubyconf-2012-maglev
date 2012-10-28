@@ -22,10 +22,23 @@ class TestPart < Test::Unit::TestCase
   end
 
   def test_adding_component
+    pen = Part.new(:name => "Pen", :cost => 4, :count => 4)
+
     @pencil.add_component @eraser
+    pen.add_component @eraser
 
     assert @pencil.components.include?(@eraser)
-    assert @eraser.where_used.include?(@pencil)
+    assert pen.components.include?(@eraser)
+  end
+
+  def test_used_in?
+    pen = Part.new(:name => "Pen", :cost => 4, :count => 4)
+
+    @pencil.add_component @eraser
+    pen.add_component @eraser
+
+    assert @eraser.used_in?(@pencil)
+    assert @eraser.used_in?(pen)
   end
 
   def test_remove_component
@@ -54,6 +67,7 @@ class TestPart < Test::Unit::TestCase
     @body.add_components(@graphite, @wood, @fitting, @eraser)
     @pencil.add_component(@body)
     output = @pencil.print_components
+
     assert_match(/^Pencil$/, output)
     assert_match(/^-- Body$/, output)
     assert_match(/^---- Graphite$/, output)
