@@ -6,6 +6,10 @@ module BenchmarkSettings
   def number_to_create
     5_000
   end
+
+  def commit_slice
+    2_500
+  end
 end
 
 namespace :bench do
@@ -20,11 +24,6 @@ namespace :bench do
     end
 
     Benchmark.bm do |x|
-      x.report('Sequel individual inserts') do
-        BenchmarkSettings.number_to_create.times do |i|
-          Part.create(:name => "Foo #{i}")
-        end
-      end
 
       x.report('Sequel transaction') do
         DB.transaction do
@@ -34,12 +33,41 @@ namespace :bench do
         end
       end
 
-      x.report('Sequel import every 2500') do
+      x.report('Sequel individual inserts') do
+        BenchmarkSettings.number_to_create.times do |i|
+          Part.create(:name => "Foo #{i}")
+        end
+      end
+
+      x.report("Sequel import every #{BenchmarkSettings.commit_slice}") do
         parts = []
         BenchmarkSettings.number_to_create.times do |i|
           parts << ["Foo #{i}"]
         end
-        DB[:parts].import([:name], parts, commit_every: 2500)
+        DB[:parts].import([:name], parts, :commit_every => BenchmarkSettings.commit_slice)
+      end
+    end
+  end
+
+  desc "Benchmark MagLev"
+  task :maglev do
+    raise "Run in MagLev please" unless defined?(Maglev)
+
+    PROOT = Maglev::PERSISTENT_ROOT
+    PROOT[:parts] = []
+
+    Maglev.persistent do
+      require "../maglev/part.rb" unless defined?(Part)
+    end
+
+    Maglev.commit_transaction
+
+    Benchmark.bm do |x|
+      x.report('MagLev transaction') do
+        BenchmarkSettings.number_to_create.times do |i|
+          PROOT[:parts] << Part.new(:name => "Foo #{i}", :cost => 10)
+        end
+        Maglev.commit_transaction
       end
     end
   end
