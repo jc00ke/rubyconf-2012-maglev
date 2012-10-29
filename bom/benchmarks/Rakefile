@@ -72,7 +72,6 @@ namespace :bench do
     raise "Run in MagLev please" unless defined?(Maglev)
 
     PROOT = Maglev::PERSISTENT_ROOT
-    PROOT[:parts] = []
 
     Maglev.persistent do
       require "../maglev/part.rb" unless defined?(Part)
@@ -81,12 +80,30 @@ namespace :bench do
     Maglev.commit_transaction
 
     Benchmark.bm do |x|
-      x.report('MagLev transaction') do
+
+      if BenchmarkSettings.number_to_create < 10_000
+        x.report('MagLev transaction, one transaction') do
+          PROOT[:parts] = []
+
+          BenchmarkSettings.number_to_create.times do |i|
+            PROOT[:parts] << Part.new(:name => "Foo #{i}", :cost => 10)
+          end
+          Maglev.commit_transaction
+        end
+      end
+
+      x.report('MagLev transaction, sliced transactions') do
+        PROOT[:parts] = []
+
         BenchmarkSettings.number_to_create.times do |i|
           PROOT[:parts] << Part.new(:name => "Foo #{i}", :cost => 10)
+          if (i % BenchmarkSettings.commit_slice).zero?
+            Maglev.commit_transaction
+          end
         end
         Maglev.commit_transaction
       end
     end
+
   end
 end
