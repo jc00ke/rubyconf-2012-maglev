@@ -1,0 +1,46 @@
+require 'benchmark'
+
+module BenchmarkSettings
+  module_function
+
+  def number_to_create
+    5_000
+  end
+end
+
+namespace :bench do
+  desc "Benchmark Sequel model"
+  task :sequel do
+    raise "Run in MRI please" unless RUBY_ENGINE == "ruby"
+
+    require_relative '../relational/db/connection'
+    require_relative '../relational/lib/models'
+    DB.tables.each do |table|
+      DB[table].delete
+    end
+
+    Benchmark.bm do |x|
+      x.report('Sequel individual inserts') do
+        BenchmarkSettings.number_to_create.times do |i|
+          Part.create(:name => "Foo #{i}")
+        end
+      end
+
+      x.report('Sequel transaction') do
+        DB.transaction do
+          BenchmarkSettings.number_to_create.times do |i|
+            Part.create(:name => "Foo #{i}")
+          end
+        end
+      end
+
+      x.report('Sequel import every 2500') do
+        parts = []
+        BenchmarkSettings.number_to_create.times do |i|
+          parts << ["Foo #{i}"]
+        end
+        DB[:parts].import([:name], parts, commit_every: 2500)
+      end
+    end
+  end
+end
