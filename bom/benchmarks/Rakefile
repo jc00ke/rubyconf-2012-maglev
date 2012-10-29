@@ -4,7 +4,7 @@ module BenchmarkSettings
   module_function
 
   def number_to_create
-    5_000
+    500_000
   end
 
   def commit_slice
